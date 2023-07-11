@@ -1,0 +1,64 @@
+In order to facilitate real-time analysis and streaming of data, we have incorporated Mosquitto as the MQTT broker 
+and Kafka as the streaming technology. To bridge the gap between MQTT and Kafka, we developed an MQTT Kafka connector. 
+This connector enables seamless integration and streaming of data from MQTT topics to Kafka, allowing for efficient data processing and analysis in real time.
+
+The below command line let's use stream the data : 
+
+I) to send from mosquitto
+1) first windows : open mosquitto (open as administrator)  : net start mosquitto (netstat -a : to so that 27.0.0.1:1883 )  is in the listening status ) 
+2) second windows:  : subscribe a topic : mosquitto_sub -t test01 -h localhost : this command will wait any publisher to publich in the test_data topic .
+3) third windows :  publish in the topic : mosquitto_pub -t test01 -h localhost -m "hello_Asma"
+
+mosquitto_pub -h 127.0.0.1 -p 1883 -t test02 -m "Hello, world!"
+
+II ) to send from KAfka : 
+1)  open zookeeper : from kafka folder we run to windows: first window :
+ .\bin\windows\zookeeper-server-start.bat ..\..\config\zookeeper.properties
+
+2) open kafka server    : from kafka folder we run to windows: second window : 
+.\bin\windows\kafka-server-start.bat ..\..\config\server.properties
+
+3) to create a topic : 
+* kafka-topic.bat will pass the argument as create  
+here the kafka server uses the local host 9092 , we have to provide a localhost and port to the bootstap server by wich we can communicate with our kafka cluster 
+* from kafka folder we run to windows , third window : 
+
+kafka-topics.bat --create --bootstrap-server localhost:9092 --topic test02
+
+* kick off (demarrer ) our producer function in ordre to produce some data then in the other hand kick off our consumer from another command line 
+producer function : 
+4) fourth window : launch the consumer:
+
+ kafka-console-consumer.bat --topic test01 --bootstrap-server localhost:9092 --from-beginning 
+
+5)  in the same window  of 3 : launch the producer : 
+
+kafka-console-producer.bat --broker-list localhost:9092 --topic test02 -m "hello asma"   : write something here 
+
+
+
+
+III) to send mosquitto to kafka through  MQTT-kafka connector steps :(see word documentation ) 
+
+1)  after configuration (see word documentation ) 
+2)  Let MQTT broker work  
+3)  Start kafka server   + zookeeper .
+4)  Start kafka connector MQTT source  (
+connect-standalone.bat ../../config/connect-standalone.properties ../../config/source-connect-mqtt.properties
+5)  making a Kafka Consumer subscribing to the topic : launch the consumer 
+ 
+kafka-console-consumer.bat --topic testA --bootstrap-server localhost:9092 --from-beginning 
+
+6)  Publish some message to a specify topic  on MQTT broker:
+mosquitto_pub -t test01 -h localhost:9092 -m "hello_word"
+
+7)  I should find it in Apache kafka consumer (I should start consumer)
+
+
+beneficial command line : 
+
+kafka-topics.bat --list --bootstrap-server localhost:9092 :Run the following command to list the topics in the Kafka cluster:
+ 
+bin\windows\kafka-topics.bat --describe --bootstrap-server <kafka-bootstrap-server> --topic test01 : get detailed information about the topic, 
+including the number of partitions, run the following command:
+
